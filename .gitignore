@@ -1,5 +1,8 @@
 /node_modules/
 
-/example/
+example/node_modules
 
 /dist/
+
+.DS_Store
+./**/.DS_Store
