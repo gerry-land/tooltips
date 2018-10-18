@@ -1,7 +1,6 @@
 .container {
   width: 100%;
   max-width: 960px;
-  margin: 50px auto;
   padding: 50px;
   background: lemonchiffon;
 }
@@ -18,4 +17,16 @@
 
 .button:hover {
   background: darkcyan;
+}
+
+.tooltip::after {
+  position: absolute;
+  content: '';
+  top: -3px;
+  left: calc(50% - 4px);
+  display: block;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  transform: rotate(45deg);
 }

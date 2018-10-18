@@ -1,0 +1,9 @@
+example
+
+/node_modules/
+
+example/node_modules
+
+.DS_Store
+
+**/.DS_Store
