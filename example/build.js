@@ -6,7 +6,7 @@ const config = {
     filename: 'script.js'
   },
   mode: 'development',
-  devtool: false
+  devtool: 'source-map'
 }
 
 const callback = (() => {
@@ -37,7 +37,7 @@ const callback = (() => {
           modules: true,
           chunkModules: false,
           chunks: false
-        }) + "\n"
+        }) + "\n" + new Date().getSeconds() + "\n"
       );
     }
   }

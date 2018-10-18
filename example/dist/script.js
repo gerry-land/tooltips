@@ -86,15 +86,273 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "../index.js":
+/*!*******************!*\
+  !*** ../index.js ***!
+  \*******************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const createElement = __webpack_require__(/*! ./src/createElement */ "../src/createElement.js");
+const removeTooltip = __webpack_require__(/*! ./src/removeTooltip */ "../src/removeTooltip.js");
+const injectElement = __webpack_require__(/*! ./src/injectElement */ "../src/injectElement.js");
+
+/**
+ * global class for creating tooltip
+ * @param {HTMLElement} element
+ * @param {String} message
+ *
+ * @returns {void}
+ */
+class Tooltip {
+  constructor(element, message) {
+    this.element = element;
+    this.message = message;
+  }
+
+  /**
+   * Rendering tooltip
+   *
+   * @returns {void}
+   */
+  render() {
+    let tooltip = createElement(this.element, this.message);
+    injectElement(tooltip);
+    removeTooltip(tooltip);
+  }
+
+}
+
+module.exports = Tooltip;
+
+
+/***/ }),
+
+/***/ "../src/createElement.js":
+/*!*******************************!*\
+  !*** ../src/createElement.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const isElementFixed = __webpack_require__(/*! ./isElementFixed */ "../src/isElementFixed.js");
+const getStyleProperty = __webpack_require__(/*! ./getStyleProperty */ "../src/getStyleProperty.js");
+const getOffsetProperty = __webpack_require__(/*! ./getOffsetProperty */ "../src/getOffsetProperty.js");
+
+/**
+ * Creating tooltip function
+ * @param {HTMLElement} element
+ * @param {String} message
+ *
+ * @returns {HTMLElement}
+ */
+function createElement(element, message) {
+  const isFixed = isElementFixed(element);
+  const minWidth = 136;
+  const tooltip = document.createElement('div');
+  tooltip.classList.add('tooltip');
+  tooltip.innerHTML = message;
+  const width = getStyleProperty(element, 'width');
+  const height = getStyleProperty(element, 'height');
+  let top = getOffsetProperty(element, 'top', isFixed);
+  let left = getOffsetProperty(element, 'left', isFixed);
+  if (width < minWidth) {
+    left = left - (minWidth - width) / 2;
+  }
+  if (isFixed) {
+    tooltip.classList.add('tooltip--fixed');
+  }
+  tooltip.style.width = width + 'px';
+  tooltip.style.top = top + height + 7 + 'px';
+  tooltip.style.left = left + 'px';
+
+  return tooltip;
+}
+
+
+module.exports = createElement;
+
+/***/ }),
+
+/***/ "../src/getOffsetProperty.js":
+/*!***********************************!*\
+  !*** ../src/getOffsetProperty.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Getting offset value by property name
+ * @param {HTMLElement} element
+ * @param {String} property
+ *
+ * @returns {Number}
+ */
+function getOffsetProperty(element, property, isFixed) {
+  let offset = element.getBoundingClientRect()[property];
+  if (!isFixed) {
+    let bodyOffset = document.body.getBoundingClientRect()[property];
+    offset -= bodyOffset;
+  }
+
+  return offset;
+}
+
+module.exports = getOffsetProperty;
+
+/***/ }),
+
+/***/ "../src/getStyleProperty.js":
+/*!**********************************!*\
+  !*** ../src/getStyleProperty.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Getting style value by property name
+ * @param {HTMLElement} element
+ * @param {String} property
+ *
+ * @returns {Number}
+ */
+function getStyleProperty(element, property) {
+  const style = window.getComputedStyle(element);
+  const result = style.getPropertyValue(property);
+  return Number.parseInt(result);
+}
+
+module.exports = getStyleProperty;
+
+/***/ }),
+
+/***/ "../src/injectElement.js":
+/*!*******************************!*\
+  !*** ../src/injectElement.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Injecting tooltip to the bottom of body
+ * @param {HTMLElement} tooltip
+ *
+ * @returns {void}
+ */
+function injectElement(tooltip) {
+  document.body.insertAdjacentElement('beforeEnd', tooltip);
+}
+
+module.exports = injectElement;
+
+/***/ }),
+
+/***/ "../src/isElementFixed.js":
+/*!********************************!*\
+  !*** ../src/isElementFixed.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Detect is element fixed
+ * @param {HTMLElement} element
+ *
+ * @returns {Boolean}
+ */
+
+function isElementFixed(element) {
+  let isFixed;
+  function recurcive(element) {
+    let style = window.getComputedStyle(element);
+    let position = style.getPropertyValue('position');
+    isFixed = position === 'fixed';
+    if (position === 'fixed') {
+      return true;
+    } else {
+      if (!element.offsetParent) {
+        return false;
+      } else {
+        return recurcive(element.offsetParent);
+      }
+    }
+  }
+
+  const promise = new Promise(resolve => {
+    resolve(recurcive(element));
+  });
+  promise.then(resolve => {
+    return resolve;
+  });
+
+  return isFixed;
+}
+
+module.exports = isElementFixed;
+
+/***/ }),
+
+/***/ "../src/removeTooltip.js":
+/*!*******************************!*\
+  !*** ../src/removeTooltip.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Implementihg close tooltip logic
+ * @param {HTMLElement} tooltip
+ * @param {HTMLElement} element
+ *
+ * @returns {void}
+ */
+function removeTooltip(tooltip) {
+  let time = setTimeout(removeElement, 5000);
+  let clickTimer = setTimeout(addClick, 50);
+  function addClick() {
+    window.addEventListener('click', checkClosest);
+    clearTimeout(clickTimer);
+  }
+
+  function checkClosest(event) {
+    let target = event.toElement;
+    if (target !== tooltip) {
+      removeElement();
+    }
+  }
+
+  function removeElement() {
+    tooltip.remove();
+    window.removeEventListener('click', checkClosest);
+    clearTimeout(time);
+  }
+}
+
+module.exports = removeTooltip;
+
+/***/ }),
+
 /***/ "./index.js":
 /*!******************!*\
   !*** ./index.js ***!
   \******************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
+const Tooltip = __webpack_require__(/*! ../index */ "../index.js");
 
+(() => {
+  const button = document.getElementsByClassName('js-button')[0];
+
+  button.addEventListener('click', () => {
+    const tooltip = new Tooltip(button, 'hi dude');
+    console.log(tooltip);
+    tooltip.render();
+  });
+
+})();
 
 /***/ })
 
 /******/ });
+//# sourceMappingURL=script.js.map
