@@ -1,7 +1,17 @@
+body {
+  margin: 0;
+  background: lightgray;
+}
+
 .container {
   width: 100%;
-  max-width: 960px;
+  height: 400px;
   padding: 50px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
   background: lemonchiffon;
 }
 
@@ -15,18 +25,12 @@
   cursor: pointer;
 }
 
-.button:hover {
-  background: darkcyan;
+.button__fixed {
+  position: fixed;
+  top: 100px;
+  right: 50px;
 }
 
-.tooltip::after {
-  position: absolute;
-  content: '';
-  top: -3px;
-  left: calc(50% - 4px);
-  display: block;
-  width: 8px;
-  height: 8px;
-  background-color: white;
-  transform: rotate(45deg);
+.button:hover {
+  background: darkcyan;
 }

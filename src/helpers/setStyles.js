@@ -1,4 +1,4 @@
-function setStyles(tooltip, config) {
+function setStyles(element, config) {
   let style = '';
 
   for (let property in config) {
@@ -7,7 +7,7 @@ function setStyles(tooltip, config) {
     }
   }
 
-  tooltip.style = style;
+  element.style = style;
 
 }
 

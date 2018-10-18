@@ -1,6 +1,7 @@
-const createElement = require('./src/createElement');
+const createTooltip = require('./src/createTooltip');
 const removeTooltip = require('./src/removeTooltip');
 const injectElement = require('./src/injectElement');
+const defaultConfig = require('./src/defaultConfig');
 
 /**
  * global class for creating tooltip
@@ -10,23 +11,15 @@ const injectElement = require('./src/injectElement');
  * @returns {void}
  */
 class Tooltip {
-  constructor(element, message, config) {
+  constructor(element, config) {
     this.element = element;
-    this.message = message;
-    this.config = Object.assign({
-      minWidth: 'min-width: 136px',
-      minHeight: '30px',
-      position: 'position: absolute',
-      zIndex: 'z-index: 10',
-      padding: 'padding: 10px',
-      borderRadius: 'border-radius: 10px',
-      background: 'background: white', 
-      color: 'color: black',
-      fontSize: 'font-size: 11px',
-      lineHeight: 'line-height: 16px',
-      textAlign: 'text-align: center',
-      fontFamily: 'font-family: Montserrat, arial'
-    }, config);
+    this.message = config.message;
+    this.config = defaultConfig;
+    this.config.style = Object.assign(defaultConfig.style, config.style);
+    this.config.arrowStyle = Object.assign(defaultConfig.arrowStyle, config.arrowStyle);
+    if(config.where) {
+      this.config.where = config.where;
+    }
   }
 
   /**
@@ -35,9 +28,9 @@ class Tooltip {
    * @returns {void}
    */
   render() {
-    let tooltip = createElement(this.element, this.message, this.config);
+    let tooltip = createTooltip(this.element, this.message, this.config);
     injectElement(tooltip);
-    removeTooltip(tooltip);
+    // removeTooltip(tooltip);
   }
 
 }

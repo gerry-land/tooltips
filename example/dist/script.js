@@ -93,9 +93,10 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const createElement = __webpack_require__(/*! ./src/createElement */ "../src/createElement.js");
+const createTooltip = __webpack_require__(/*! ./src/createTooltip */ "../src/createTooltip.js");
 const removeTooltip = __webpack_require__(/*! ./src/removeTooltip */ "../src/removeTooltip.js");
 const injectElement = __webpack_require__(/*! ./src/injectElement */ "../src/injectElement.js");
+const defaultConfig = __webpack_require__(/*! ./src/defaultConfig */ "../src/defaultConfig.js");
 
 /**
  * global class for creating tooltip
@@ -105,23 +106,15 @@ const injectElement = __webpack_require__(/*! ./src/injectElement */ "../src/inj
  * @returns {void}
  */
 class Tooltip {
-  constructor(element, message, config) {
+  constructor(element, config) {
     this.element = element;
-    this.message = message;
-    this.config = Object.assign({
-      minWidth: 'min-width: 136px',
-      minHeight: '30px',
-      position: 'position: absolute',
-      zIndex: 'z-index: 10',
-      padding: 'padding: 10px',
-      borderRadius: 'border-radius: 10px',
-      background: 'background: white', 
-      color: 'color: black',
-      fontSize: 'font-size: 11px',
-      lineHeight: 'line-height: 16px',
-      textAlign: 'text-align: center',
-      fontFamily: 'font-family: Montserrat, arial'
-    }, config);
+    this.message = config.message;
+    this.config = defaultConfig;
+    this.config.style = Object.assign(defaultConfig.style, config.style);
+    this.config.arrowStyle = Object.assign(defaultConfig.arrowStyle, config.arrowStyle);
+    if(config.where) {
+      this.config.where = config.where;
+    }
   }
 
   /**
@@ -130,9 +123,9 @@ class Tooltip {
    * @returns {void}
    */
   render() {
-    let tooltip = createElement(this.element, this.message, this.config);
+    let tooltip = createTooltip(this.element, this.message, this.config);
     injectElement(tooltip);
-    removeTooltip(tooltip);
+    // removeTooltip(tooltip);
   }
 
 }
@@ -142,17 +135,18 @@ module.exports = Tooltip;
 
 /***/ }),
 
-/***/ "../src/createElement.js":
+/***/ "../src/createTooltip.js":
 /*!*******************************!*\
-  !*** ../src/createElement.js ***!
+  !*** ../src/createTooltip.js ***!
   \*******************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const isElementFixed = __webpack_require__(/*! ./isElementFixed */ "../src/isElementFixed.js");
-const getStyleProperty = __webpack_require__(/*! ./getStyleProperty */ "../src/getStyleProperty.js");
-const getOffsetProperty = __webpack_require__(/*! ./getOffsetProperty */ "../src/getOffsetProperty.js");
-const setStyles = __webpack_require__(/*! ./setStyles */ "../src/setStyles.js");
+const setStyles = __webpack_require__(/*! ./helpers/setStyles */ "../src/helpers/setStyles.js");
+const createTooltipArrow = __webpack_require__(/*! ./createTooltipArrow */ "../src/createTooltipArrow.js");
+const createTooltipContent = __webpack_require__(/*! ./createTooltipContent */ "../src/createTooltipContent.js");
+const getTooltipStyles = __webpack_require__(/*! ./helpers/getTooltipStyles */ "../src/helpers/getTooltipStyles.js");
+const getStyleProperty = __webpack_require__(/*! ./helpers/getStyleProperty */ "../src/helpers/getStyleProperty.js");
 
 /**
  * Creating tooltip function
@@ -161,43 +155,209 @@ const setStyles = __webpack_require__(/*! ./setStyles */ "../src/setStyles.js");
  *
  * @returns {HTMLElement}
  */
-function createElement(element, message, config) {
-  const isFixed = isElementFixed(element);
-  const minWidth = 136;
+function createTooltip(element, message, config) {
+  
   const tooltip = document.createElement('div');
-  const width = getStyleProperty(element, 'width');
-  const height = getStyleProperty(element, 'height');
-  let top = getOffsetProperty(element, 'top', isFixed);
-  let left = getOffsetProperty(element, 'left', isFixed);
-  
   tooltip.classList.add('tooltip');
-  tooltip.innerHTML = message;
+ 
+  const tooltipStyles = getTooltipStyles(config.where, config.position, element);
   
-  if (width < minWidth) {
-    left = left - (minWidth - width) / 2;
-  }
-  if (isFixed) {
-    tooltip.classList.add('tooltip--fixed');
+  console.log(tooltipStyles);
+
+  setStyles(tooltip, tooltipStyles);
+  
+  const width = getStyleProperty(element, 'width');
+  config.style.width = 'width: ' + width + 'px';
+
+  /**
+   * create tooltip content;
+   */
+  const tooltipContent = createTooltipContent(config.style, message);
+
+  /**
+   * if arrow exist - create it
+   */
+  if(config.isArrow) {
+    createTooltipArrow(tooltip, config.arrowStyle, config.where);
   }
 
-  config.width = 'width: ' + width + 'px';
-  config.top = 'top: ' + (top + height + 7) + 'px';
-  config.left = 'left: ' + left + 'px';
-
-  setStyles(tooltip, config);
+  tooltip.insertAdjacentElement('afterBegin', tooltipContent);
 
   return tooltip;
 }
 
-
-module.exports = createElement;
+module.exports = createTooltip;
 
 /***/ }),
 
-/***/ "../src/getOffsetProperty.js":
-/*!***********************************!*\
-  !*** ../src/getOffsetProperty.js ***!
-  \***********************************/
+/***/ "../src/createTooltipArrow.js":
+/*!************************************!*\
+  !*** ../src/createTooltipArrow.js ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const getArrowPosition = __webpack_require__(/*! ./helpers/getArrowPosition */ "../src/helpers/getArrowPosition.js");
+const setStyles = __webpack_require__(/*! ./helpers/setStyles */ "../src/helpers/setStyles.js");
+
+function createTooltipArrow(tooltip, style, position) {
+  
+  const size = parseInt(style.width.split(':')[1], 10);
+
+  const arrow = document.createElement('div');
+  arrow.classList.add('tooltip__arrow');
+
+  style.background = 'background: red';
+
+  const arrowPosition = getArrowPosition(position, size);
+
+  console.log(arrowPosition);
+
+  style.x = arrowPosition.x;
+  style.y = arrowPosition.y;
+
+  setStyles(arrow, style);
+
+  tooltip.insertAdjacentElement('beforeEnd', arrow);
+}
+
+module.exports = createTooltipArrow;
+
+/***/ }),
+
+/***/ "../src/createTooltipContent.js":
+/*!**************************************!*\
+  !*** ../src/createTooltipContent.js ***!
+  \**************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const setStyles = __webpack_require__(/*! ./helpers/setStyles */ "../src/helpers/setStyles.js");
+
+function createTooltipContent(styles, message) {
+
+  const tooltipContent = document.createElement('div');
+  
+  tooltipContent.classList.add('tooltip__content');
+  tooltipContent.innerHTML = message;
+
+  setStyles(tooltipContent, styles);
+
+  return tooltipContent;
+
+}
+
+
+module.exports = createTooltipContent;
+
+/***/ }),
+
+/***/ "../src/defaultConfig.js":
+/*!*******************************!*\
+  !*** ../src/defaultConfig.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Set up default config for tooltip
+ */
+
+const config = {
+  where: 'bottom',
+  position: 'absolute',
+  isArrow: true,
+  style: {
+    minWidth: 'min-width: 136px',
+    minHeight: '30px',
+    padding: 'padding: 10px',
+    boxSizing: 'box-sizing: border-box',
+    borderRadius: 'border-radius: 10px',
+    background: 'background: white', 
+    color: 'color: black',
+    fontSize: 'font-size: 11px',
+    lineHeight: 'line-height: 16px',
+    textAlign: 'text-align: center',
+    fontFamily: 'font-family: Montserrat, arial',
+  },
+  arrowStyle: {
+    position: 'position: absolute',
+    zIndex: 'z-index: -1',
+    background: 'background: inherit', 
+    width: 'width: 10px',
+    height: 'height: 10px',
+    transform: 'transform: rotate(45deg)'
+  }
+}
+
+module.exports = config;
+
+/***/ }),
+
+/***/ "../src/helpers/getArrowPosition.js":
+/*!******************************************!*\
+  !*** ../src/helpers/getArrowPosition.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const getStyleProperty = __webpack_require__(/*! ./getStyleProperty */ "../src/helpers/getStyleProperty.js");
+
+function getPosition(position, size) { 
+  
+  let x, y;
+
+  const offset = Math.round(size/2);
+  
+  const left = 'calc((100% -' + size + 'px) / 2)';
+  const top = 'calc((100% - ' + size + 'px) / 2)';
+  
+  console.log(position);
+
+  switch (position) {
+    case 'top': {
+      y = 'bottom: -' + offset + 'px';
+      x = 'left: ' + left;
+      break;
+    }
+
+    case 'left': {
+
+
+      break;
+    }
+    
+    case 'bottom': {
+
+      break;
+    }
+
+    case 'right': {
+
+      break;
+    }
+
+    default: {
+      x = 'left: 50%';
+      y = 'top: 50%';
+    }
+  }
+  
+  return {
+    x: x,
+    y: y
+  }
+
+}
+
+module.exports = getPosition;
+
+/***/ }),
+
+/***/ "../src/helpers/getOffsetProperty.js":
+/*!*******************************************!*\
+  !*** ../src/helpers/getOffsetProperty.js ***!
+  \*******************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -222,10 +382,10 @@ module.exports = getOffsetProperty;
 
 /***/ }),
 
-/***/ "../src/getStyleProperty.js":
-/*!**********************************!*\
-  !*** ../src/getStyleProperty.js ***!
-  \**********************************/
+/***/ "../src/helpers/getStyleProperty.js":
+/*!******************************************!*\
+  !*** ../src/helpers/getStyleProperty.js ***!
+  \******************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -246,31 +406,128 @@ module.exports = getStyleProperty;
 
 /***/ }),
 
-/***/ "../src/injectElement.js":
-/*!*******************************!*\
-  !*** ../src/injectElement.js ***!
-  \*******************************/
+/***/ "../src/helpers/getTooltipPosition.js":
+/*!********************************************!*\
+  !*** ../src/helpers/getTooltipPosition.js ***!
+  \********************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-/**
- * Injecting tooltip to the bottom of body
- * @param {HTMLElement} tooltip
- *
- * @returns {void}
- */
-function injectElement(tooltip) {
-  document.body.insertAdjacentElement('beforeEnd', tooltip);
+function getTooltipPosition(dimension, where) {
+
+  const offset = {};
+
+  switch (where) {
+    case 'top': {
+      offset.x = dimension.left;
+      // offset.y = dimension.top;
+
+      break;
+    }
+
+    case 'bottom': {
+      offset.x = dimension.left;
+      offset.y = dimension.top + dimension.height;
+
+      break;
+    }
+
+
+    // case 'left': {
+    //   offset.x = left;
+    //   offset.y = ;
+
+    //   break;
+    // }
+
+    // case 'right': {
+    //   offset.x = left;
+    //   offset.y = '';
+
+    //   break;
+    // }
+  }
+
+
+
+
+  return offset;
+
+  console.log(dimension);
+  console.log(where);
+
 }
 
-module.exports = injectElement;
+
+module.exports = getTooltipPosition;
 
 /***/ }),
 
-/***/ "../src/isElementFixed.js":
-/*!********************************!*\
-  !*** ../src/isElementFixed.js ***!
-  \********************************/
+/***/ "../src/helpers/getTooltipStyles.js":
+/*!******************************************!*\
+  !*** ../src/helpers/getTooltipStyles.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const getStyleProperty = __webpack_require__(/*! ./getStyleProperty */ "../src/helpers/getStyleProperty.js");
+const getOffsetProperty = __webpack_require__(/*! ./getOffsetProperty */ "../src/helpers/getOffsetProperty.js");
+const isElementFixed = __webpack_require__(/*! ./isElementFixed */ "../src/helpers/isElementFixed.js");
+const getTooltipPosition = __webpack_require__(/*! ./getTooltipPosition */ "../src/helpers/getTooltipPosition.js");
+
+
+function getTooltipStyle(where, position, element) {
+
+  const isFixed = isElementFixed(element);  
+
+  const styles = {
+    position: 'position: ' + position,
+    zIndex: 'z-index: 1'
+  }
+  
+  if (isFixed) {
+    styles.position = 'position: fixed';
+  }
+  
+  const height = getStyleProperty(element, 'height');
+  
+  let top = getOffsetProperty(element, 'top', isFixed);
+  let left = getOffsetProperty(element, 'left', isFixed);
+  
+  const minWidth = 136;
+  let width = getStyleProperty(element, 'width');
+
+  if (width < minWidth) {
+    left = Math.round(left - ((minWidth - width) / 2));
+  } else {
+    left = Math.round(left - ((width - minWidth) / 2));
+  }
+
+  const dimension = {
+    width: width,
+    height: height,
+    top: top,
+    left: left
+  }
+
+  const offset = getTooltipPosition(dimension, where);
+
+  styles.left = 'left: ' + offset.x + 'px';
+  styles.top = 'top: ' + offset.y + 'px';
+
+
+  return styles;
+
+}
+
+module.exports = getTooltipStyle;
+
+/***/ }),
+
+/***/ "../src/helpers/isElementFixed.js":
+/*!****************************************!*\
+  !*** ../src/helpers/isElementFixed.js ***!
+  \****************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -309,6 +566,51 @@ function isElementFixed(element) {
 }
 
 module.exports = isElementFixed;
+
+/***/ }),
+
+/***/ "../src/helpers/setStyles.js":
+/*!***********************************!*\
+  !*** ../src/helpers/setStyles.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function setStyles(element, config) {
+  let style = '';
+
+  for (let property in config) {
+    if (config.hasOwnProperty(property)) {
+      style += config[property] + '; ';
+    }
+  }
+
+  element.style = style;
+
+}
+
+module.exports = setStyles;
+
+/***/ }),
+
+/***/ "../src/injectElement.js":
+/*!*******************************!*\
+  !*** ../src/injectElement.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Injecting tooltip to the bottom of body
+ * @param {HTMLElement} tooltip
+ *
+ * @returns {void}
+ */
+function injectElement(tooltip) {
+  document.body.insertAdjacentElement('beforeEnd', tooltip);
+}
+
+module.exports = injectElement;
 
 /***/ }),
 
@@ -352,30 +654,6 @@ module.exports = removeTooltip;
 
 /***/ }),
 
-/***/ "../src/setStyles.js":
-/*!***************************!*\
-  !*** ../src/setStyles.js ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-function setStyles(tooltip, config) {
-  let style = '';
-
-  for (let property in config) {
-    if (config.hasOwnProperty(property)) {
-      style += config[property] + '; ';
-    }
-  }
-
-  tooltip.style = style;
-
-}
-
-module.exports = setStyles;
-
-/***/ }),
-
 /***/ "./index.js":
 /*!******************!*\
   !*** ./index.js ***!
@@ -386,13 +664,49 @@ module.exports = setStyles;
 const Tooltip = __webpack_require__(/*! ../index */ "../index.js");
 
 (() => {
-  const button = document.getElementsByClassName('js-button')[0];
+  const button_1 = document.getElementsByClassName('js-button-1')[0];
 
-  button.addEventListener('click', () => {
-    const tooltip = new Tooltip(button, 'hi dude');
+  button_1.addEventListener('click', () => {
+    const tooltip = new Tooltip(button_1, {
+      message: 'hi dude from 1 button'
+    });
     console.log(tooltip);
     tooltip.render();
   });
+  
+  const button_2 = document.getElementsByClassName('js-button-2')[0];
+
+  button_2.addEventListener('click', () => {
+    const tooltip = new Tooltip(button_2, {
+      message: 'hi dude from 2 button',
+      where: 'top'
+    });
+    console.log(tooltip);
+    tooltip.render();
+  });
+
+  const button_3 = document.getElementsByClassName('js-button-3')[0];
+
+  button_3.addEventListener('click', () => {
+    const tooltip = new Tooltip(button_3, {
+      message: 'hi dude from 3 button'
+    });
+    console.log(tooltip);
+    tooltip.render();
+  });
+
+  const button_4 = document.getElementsByClassName('js-button-4')[0];
+
+  button_4.addEventListener('click', () => {
+    const tooltip = new Tooltip(button_4, {
+      message: 'hi dude from 4 button'
+    });
+    console.log(tooltip);
+    tooltip.render();
+  });
+
+
+  
 
 })();
 
