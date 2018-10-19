@@ -5,9 +5,9 @@ const Tooltip = require('../index');
 
   button_1.addEventListener('click', () => {
     const tooltip = new Tooltip(button_1, {
-      message: 'hi dude from 1 button'
+      message: 'hi dude from 1 button',
+      where: 'top'
     });
-    console.log(tooltip);
     tooltip.render();
   });
   
@@ -16,9 +16,8 @@ const Tooltip = require('../index');
   button_2.addEventListener('click', () => {
     const tooltip = new Tooltip(button_2, {
       message: 'hi dude from 2 button',
-      where: 'top'
+      where: 'right'
     });
-    console.log(tooltip);
     tooltip.render();
   });
 
@@ -26,9 +25,9 @@ const Tooltip = require('../index');
 
   button_3.addEventListener('click', () => {
     const tooltip = new Tooltip(button_3, {
-      message: 'hi dude from 3 button'
+      message: 'hi dude from 3 button',
+      where: 'bottom'
     });
-    console.log(tooltip);
     tooltip.render();
   });
 
@@ -36,9 +35,9 @@ const Tooltip = require('../index');
 
   button_4.addEventListener('click', () => {
     const tooltip = new Tooltip(button_4, {
-      message: 'hi dude from 4 button'
+      message: 'hi dude from 4 button',
+      where: 'left'
     });
-    console.log(tooltip);
     tooltip.render();
   });
 
