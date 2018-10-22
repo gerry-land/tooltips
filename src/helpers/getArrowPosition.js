@@ -2,7 +2,7 @@ function getPosition(position, size) {
   
   let x, y;
 
-  const offset = Math.round(size/2);
+  const offset = Math.round(size/2) + 'px';
 
   const left = 'calc((100% - ' + size + 'px) / 2)';
   const top = 'calc((100% - ' + size + 'px) / 2)';
