@@ -1,3 +1,14 @@
+/**
+ * Get tooltip position from element
+ * 
+ * And set up difference value for top, left, right positioned tooltips
+ * 
+ * @param {Object} dimension 
+ * @param {String} where 
+ * 
+ * @return {Object}
+ */
+
 function getTooltipPosition(dimension, where) {
 
   const offset = {};
@@ -5,7 +16,8 @@ function getTooltipPosition(dimension, where) {
   switch (where) {
     case 'top': {
       offset.x = dimension.left;
-      // offset.y = dimension.top;
+      offset.y = dimension.top - dimension.height;
+      // offset.difference = 'whole';
 
       break;
     }
@@ -17,31 +29,24 @@ function getTooltipPosition(dimension, where) {
       break;
     }
 
+    case 'left': {
+      offset.x = dimension.left - dimension.width - 4;
+      offset.y = dimension.top;
+      // offset.difference = 'half';
 
-    // case 'left': {
-    //   offset.x = left;
-    //   offset.y = ;
+      break;
+    }
 
-    //   break;
-    // }
+    case 'right': {
+      offset.x = dimension.left + dimension.width + 4;
+      offset.y = dimension.top;
+      // offset.difference = 'half';
 
-    // case 'right': {
-    //   offset.x = left;
-    //   offset.y = '';
-
-    //   break;
-    // }
+      break;
+    }
   }
 
-
-
-
   return offset;
-
-  console.log(dimension);
-  console.log(where);
-
 }
-
 
 module.exports = getTooltipPosition;

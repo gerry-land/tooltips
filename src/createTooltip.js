@@ -2,7 +2,7 @@ const setStyles = require('./helpers/setStyles');
 const createTooltipArrow = require('./createTooltipArrow');
 const createTooltipContent = require('./createTooltipContent');
 const getTooltipStyles = require('./helpers/getTooltipStyles');
-const getStyleProperty = require('./helpers/getStyleProperty');
+const insertElement = require('./helpers/insertElement');
 
 /**
  * Creating tooltip function
@@ -17,27 +17,22 @@ function createTooltip(element, message, config) {
   tooltip.classList.add('tooltip');
  
   const tooltipStyles = getTooltipStyles(config.where, config.position, element);
-  
-  console.log(tooltipStyles);
-
-  setStyles(tooltip, tooltipStyles);
-  
-  const width = getStyleProperty(element, 'width');
-  config.style.width = 'width: ' + width + 'px';
 
   /**
    * create tooltip content;
    */
-  const tooltipContent = createTooltipContent(config.style, message);
-
+  const tooltipContent = createTooltipContent(config.style, message, element);
+  
   /**
    * if arrow exist - create it
    */
   if(config.isArrow) {
-    createTooltipArrow(tooltip, config.arrowStyle, config.where);
+    let arrow = createTooltipArrow(tooltip, config);
+    insertElement(tooltipContent, arrow);
   }
 
-  tooltip.insertAdjacentElement('afterBegin', tooltipContent);
+  tooltipStyles.arrowOffset = config.arrowOffset;
+  insertElement(tooltip, tooltipContent, tooltipStyles);
 
   return tooltip;
 }

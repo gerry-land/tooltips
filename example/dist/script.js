@@ -147,7 +147,6 @@ const setStyles = __webpack_require__(/*! ./helpers/setStyles */ "../src/helpers
 const createTooltipArrow = __webpack_require__(/*! ./createTooltipArrow */ "../src/createTooltipArrow.js");
 const createTooltipContent = __webpack_require__(/*! ./createTooltipContent */ "../src/createTooltipContent.js");
 const getTooltipStyles = __webpack_require__(/*! ./helpers/getTooltipStyles */ "../src/helpers/getTooltipStyles.js");
-const getStyleProperty = __webpack_require__(/*! ./helpers/getStyleProperty */ "../src/helpers/getStyleProperty.js");
 const insertElement = __webpack_require__(/*! ./helpers/insertElement */ "../src/helpers/insertElement.js");
 
 /**
@@ -163,22 +162,21 @@ function createTooltip(element, message, config) {
   tooltip.classList.add('tooltip');
  
   const tooltipStyles = getTooltipStyles(config.where, config.position, element);
-    
-  const width = getStyleProperty(element, 'width');
-  config.style.width = 'width: ' + width + 'px';
+
+  /**
+   * create tooltip content;
+   */
+  const tooltipContent = createTooltipContent(config.style, message, element);
   
   /**
    * if arrow exist - create it
    */
   if(config.isArrow) {
-    createTooltipArrow(tooltip, config);
+    let arrow = createTooltipArrow(tooltip, config);
+    insertElement(tooltipContent, arrow);
   }
-  tooltipStyles.arrowOffset = config.arrowOffset;
 
-  /**
-   * create tooltip content;
-   */
-  const tooltipContent = createTooltipContent(config.style, message);
+  tooltipStyles.arrowOffset = config.arrowOffset;
   insertElement(tooltip, tooltipContent, tooltipStyles);
 
   return tooltip;
@@ -202,14 +200,15 @@ function createTooltipArrow(tooltip, config) {
   
   const style = config.arrowStyle;
   const position = config.where;
-  const size = parseInt(style.width.split(':')[1], 10);
+  const size = +style.size;
 
   config.arrowOffset = size;
 
+  style.width = 'width: ' + size + 'px;'
+  style.height = 'height: ' + size + 'px;'
+
   const arrow = document.createElement('div');
   arrow.classList.add('tooltip__arrow');
-
-  style.background = 'background: red';
 
   const arrowPosition = getArrowPosition(position, size);
 
@@ -218,7 +217,7 @@ function createTooltipArrow(tooltip, config) {
 
   setStyles(arrow, style);
 
-  tooltip.insertAdjacentElement('beforeEnd', arrow);
+  return arrow;
 }
 
 module.exports = createTooltipArrow;
@@ -233,13 +232,18 @@ module.exports = createTooltipArrow;
 /***/ (function(module, exports, __webpack_require__) {
 
 const setStyles = __webpack_require__(/*! ./helpers/setStyles */ "../src/helpers/setStyles.js");
+const getStyleProperty = __webpack_require__(/*! ./helpers/getStyleProperty */ "../src/helpers/getStyleProperty.js");
 
-function createTooltipContent(styles, message) {
+function createTooltipContent(styles, message, element) {
 
   const tooltipContent = document.createElement('div');
   
   tooltipContent.classList.add('tooltip__content');
   tooltipContent.innerHTML = message;
+
+  const width = getStyleProperty(element, 'width');
+  styles.width = 'width: ' + width + 'px';
+  styles.marginLeft = 'margin-left: calc((' + width + 'px - 100%) / 2)'
 
   setStyles(tooltipContent, styles);
 
@@ -269,6 +273,7 @@ function getDefaultConfig() {
     position: 'absolute',
     isArrow: true,
     style: {
+      position: 'position: relative',
       minWidth: 'min-width: 136px',
       minHeight: '30px',
       padding: 'padding: 10px 10px',
@@ -282,11 +287,10 @@ function getDefaultConfig() {
       fontFamily: 'font-family: Montserrat, arial',
     },
     arrowStyle: {
+      background: 'background: inherit',
       position: 'position: absolute',
       zIndex: 'z-index: -1',
-      background: 'background: inherit', 
-      width: 'width: 10px',
-      height: 'height: 10px',
+      size: '10',
       transform: 'transform: rotate(45deg)'
     }
   }
@@ -436,7 +440,7 @@ function getTooltipPosition(dimension, where) {
     case 'top': {
       offset.x = dimension.left;
       offset.y = dimension.top - dimension.height;
-      offset.difference = 'whole';
+      // offset.difference = 'whole';
 
       break;
     }
@@ -451,7 +455,7 @@ function getTooltipPosition(dimension, where) {
     case 'left': {
       offset.x = dimension.left - dimension.width - 4;
       offset.y = dimension.top;
-      offset.difference = 'half';
+      // offset.difference = 'half';
 
       break;
     }
@@ -459,7 +463,7 @@ function getTooltipPosition(dimension, where) {
     case 'right': {
       offset.x = dimension.left + dimension.width + 4;
       offset.y = dimension.top;
-      offset.difference = 'half';
+      // offset.difference = 'half';
 
       break;
     }
@@ -503,14 +507,7 @@ function getTooltipStyle(where, position, element) {
   let top = getOffsetProperty(element, 'top', isFixed);
   let left = getOffsetProperty(element, 'left', isFixed);
   
-  const minWidth = 136;
   let width = getStyleProperty(element, 'width');
-
-  if (width < minWidth) {
-    left = Math.round(left - ((minWidth - width) / 2));
-  } else {
-    left = Math.round(left - ((width - minWidth) / 2));
-  }
 
   const dimension = {
     width: width,
@@ -521,10 +518,8 @@ function getTooltipStyle(where, position, element) {
 
   const offset = getTooltipPosition(dimension, where);
 
-  // styles.left = 'left: ' + offset.x;
-  // styles.top = 'top: ' + offset.y;
-  // styles.difference = offset.difference;
   styles.elementHeight = height;
+  styles.where = where;
 
   return Object.assign(styles, offset)
 
@@ -555,6 +550,8 @@ const setStyles = __webpack_require__(/*! ./setStyles */ "../src/helpers/setStyl
 
 function insertElement(parent, element, config) {
 
+  console.log(config);
+
   if (config) {
     const paste = new Promise((resolve) => {
       resolve(
@@ -562,21 +559,43 @@ function insertElement(parent, element, config) {
       );
     });
 
+    let arrow = config.arrowOffset || 0;
+
     paste.then(resolve => {
       config.display = 'display: block'
       let top;
       const contentHeight = element.clientHeight;
-      if (config.difference === 'half') {
-        top = config.y - ((contentHeight - config.elementHeight) / 2);
-        config.top = 'top: ' + top;
-        config.left = 'left: ' + config.x;
-      } else if (config.difference === 'whole') {
-        top = config.y - (contentHeight - config.elementHeight);
-        config.top = 'top: ' + top;
-        config.left = 'left: ' + config.x;
-      } else { 
-        config.top = 'top: ' + config.y;
-        config.left = 'left: ' + config.x;
+
+      switch (config.where) {
+        case 'right': {
+          top = config.y - ((contentHeight - config.elementHeight) / 2);
+          config.top = 'top: ' + top;
+          config.left = 'left: ' + (config.x + arrow);
+
+          break;
+        }
+
+        case 'left': {
+          top = config.y - ((contentHeight - config.elementHeight) / 2);
+          config.top = 'top: ' + top;
+          config.left = 'left: ' + (config.x - arrow);
+
+          break;
+        }
+
+        case 'top': {
+          top = config.y - (contentHeight - config.elementHeight);
+          config.top = 'top: ' + (top - arrow);
+          config.left = 'left: ' + config.x;
+          break;
+        }
+
+        default: {
+          config.top = 'top: ' + (config.y + arrow);
+          config.left = 'left: ' + config.x;
+
+          break;
+        }
       }
 
       setStyles(parent, config);
