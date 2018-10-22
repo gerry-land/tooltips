@@ -1,6 +1,6 @@
 # Creating flexible tooltip
 
-* npm i tooltip-zeo
+* npm i make-tooltips
 
 ## Default config 
 
@@ -34,6 +34,7 @@ config = {
 ```
 
 where - *on what side of element tooltip will be render* 
+
 can be: 
   * 'left'
   * 'top'
