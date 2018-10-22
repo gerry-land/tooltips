@@ -1,5 +1,3 @@
-const getStyleProperty = require('./getStyleProperty');
-
 function getPosition(position, size) { 
   
   let x, y;

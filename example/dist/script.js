@@ -143,7 +143,6 @@ module.exports = Tooltip;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const setStyles = __webpack_require__(/*! ./helpers/setStyles */ "../src/helpers/setStyles.js");
 const createTooltipArrow = __webpack_require__(/*! ./createTooltipArrow */ "../src/createTooltipArrow.js");
 const createTooltipContent = __webpack_require__(/*! ./createTooltipContent */ "../src/createTooltipContent.js");
 const getTooltipStyles = __webpack_require__(/*! ./helpers/getTooltipStyles */ "../src/helpers/getTooltipStyles.js");
@@ -259,9 +258,7 @@ module.exports = createTooltipContent;
   !*** ../src/helpers/getArrowPosition.js ***!
   \******************************************/
 /*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-const getStyleProperty = __webpack_require__(/*! ./getStyleProperty */ "../src/helpers/getStyleProperty.js");
+/***/ (function(module, exports) {
 
 function getPosition(position, size) { 
   
@@ -563,30 +560,30 @@ function insertElement(parent, element, config) {
       switch (config.where) {
         case 'right': {
           top = config.y - ((contentHeight - config.elementHeight) / 2);
-          config.top = 'top: ' + top;
-          config.left = 'left: ' + (config.x + arrow);
+          config.top = 'top: ' + top + 'px';
+          config.left = 'left: ' + (config.x + arrow) + 'px'; 
 
           break;
         }
 
         case 'left': {
           top = config.y - ((contentHeight - config.elementHeight) / 2);
-          config.top = 'top: ' + top;
-          config.left = 'left: ' + (config.x - arrow);
+          config.top = 'top: ' + top + 'px';
+          config.left = 'left: ' + (config.x - arrow) + 'px';
 
           break;
         }
 
         case 'top': {
           top = config.y - (contentHeight - config.elementHeight);
-          config.top = 'top: ' + (top - arrow);
-          config.left = 'left: ' + config.x;
+          config.top = 'top: ' + (top - arrow) + 'px';
+          config.left = 'left: ' + config.x + 'px';
           break;
         }
 
         default: {
-          config.top = 'top: ' + (config.y + arrow);
-          config.left = 'left: ' + config.x;
+          config.top = 'top: ' + (config.y + arrow) + 'px';
+          config.left = 'left: ' + config.x + 'px';
 
           break;
         }

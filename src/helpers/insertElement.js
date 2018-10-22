@@ -29,30 +29,30 @@ function insertElement(parent, element, config) {
       switch (config.where) {
         case 'right': {
           top = config.y - ((contentHeight - config.elementHeight) / 2);
-          config.top = 'top: ' + top;
-          config.left = 'left: ' + (config.x + arrow);
+          config.top = 'top: ' + top + 'px';
+          config.left = 'left: ' + (config.x + arrow) + 'px'; 
 
           break;
         }
 
         case 'left': {
           top = config.y - ((contentHeight - config.elementHeight) / 2);
-          config.top = 'top: ' + top;
-          config.left = 'left: ' + (config.x - arrow);
+          config.top = 'top: ' + top + 'px';
+          config.left = 'left: ' + (config.x - arrow) + 'px';
 
           break;
         }
 
         case 'top': {
           top = config.y - (contentHeight - config.elementHeight);
-          config.top = 'top: ' + (top - arrow);
-          config.left = 'left: ' + config.x;
+          config.top = 'top: ' + (top - arrow) + 'px';
+          config.left = 'left: ' + config.x + 'px';
           break;
         }
 
         default: {
-          config.top = 'top: ' + (config.y + arrow);
-          config.left = 'left: ' + config.x;
+          config.top = 'top: ' + (config.y + arrow) + 'px';
+          config.left = 'left: ' + config.x + 'px';
 
           break;
         }

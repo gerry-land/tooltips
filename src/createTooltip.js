@@ -1,4 +1,3 @@
-const setStyles = require('./helpers/setStyles');
 const createTooltipArrow = require('./createTooltipArrow');
 const createTooltipContent = require('./createTooltipContent');
 const getTooltipStyles = require('./helpers/getTooltipStyles');
