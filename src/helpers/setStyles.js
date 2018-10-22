@@ -8,7 +8,6 @@ function setStyles(element, config) {
   }
 
   element.style = style;
-
 }
 
 module.exports = setStyles;

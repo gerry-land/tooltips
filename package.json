@@ -1,10 +1,10 @@
 {
-  "name": "tooltip-zeo",
-  "version": "0.0.1",
+  "name": "make-tooltips",
+  "version": "0.1.0",
   "description": "module for creating flexible tooltips",
   "main": "index.js",
   "scripts": {
-    "start": "webpack ./example/script.js --development"
+    "start": "node example/build.js"
   },
   "author": "gerry",
   "license": "ISC",

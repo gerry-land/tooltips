@@ -15,8 +15,6 @@ function createTooltipContent(styles, message, element) {
   setStyles(tooltipContent, styles);
 
   return tooltipContent;
-
 }
-
 
 module.exports = createTooltipContent;

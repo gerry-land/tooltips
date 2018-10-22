@@ -1,7 +1,7 @@
 const createTooltip = require('./src/createTooltip');
 const removeTooltip = require('./src/removeTooltip');
 const insertElement = require('./src/helpers/insertElement');
-const getDefaultConfig = require('./src/getDefaultConfig');
+const getDefaultConfig = require('./src/helpers/getDefaultConfig');
 
 /**
  * global class for creating tooltip
@@ -31,7 +31,7 @@ class Tooltip {
   render() {
     let tooltip = createTooltip(this.element, this.message, this.config);
     insertElement(document.body, tooltip);
-    // removeTooltip(tooltip);
+    removeTooltip(tooltip);
   }
 
 }

@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  background: lightgray;
+  background: lightcoral;
 }
 
 .container {
@@ -12,7 +12,6 @@ body {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: lemonchiffon;
 }
 
 .button {

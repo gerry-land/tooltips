@@ -9,9 +9,8 @@ function getDefaultConfig() {
     isArrow: true,
     style: {
       position: 'position: relative',
-      minWidth: 'min-width: 136px',
       minHeight: '30px',
-      padding: 'padding: 10px 10px',
+      padding: 'padding: 10px',
       boxSizing: 'box-sizing: border-box',
       borderRadius: 'border-radius: 10px',
       background: 'background: white', 
@@ -19,13 +18,14 @@ function getDefaultConfig() {
       fontSize: 'font-size: 11px',
       lineHeight: 'line-height: 16px',
       textAlign: 'text-align: center',
-      fontFamily: 'font-family: Montserrat, arial',
+      fontFamily: 'font-family: Montserrat, arial'
     },
     arrowStyle: {
-      background: 'background: inherit',
       position: 'position: absolute',
-      zIndex: 'z-index: -1',
+      background: 'background: inherit',
+      color: 'color: inherit',
       size: '10',
+      zIndex: 'z-index: -1',
       transform: 'transform: rotate(45deg)'
     }
   }

@@ -37,7 +37,6 @@ function getTooltipStyle(where, position, element) {
   styles.where = where;
 
   return Object.assign(styles, offset)
-
 }
 
 module.exports = getTooltipStyle;

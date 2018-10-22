@@ -12,8 +12,6 @@ const setStyles = require('./setStyles');
 
 function insertElement(parent, element, config) {
 
-  console.log(config);
-
   if (config) {
     const paste = new Promise((resolve) => {
       resolve(
@@ -65,7 +63,6 @@ function insertElement(parent, element, config) {
   } else {
     parent.insertAdjacentElement('beforeEnd', element);
   }
-
 }
 
 module.exports = insertElement;

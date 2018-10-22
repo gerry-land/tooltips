@@ -6,7 +6,14 @@ const Tooltip = require('../index');
   button_1.addEventListener('click', () => {
     const tooltip = new Tooltip(button_1, {
       message: 'hi dude from 1 button',
-      where: 'top'
+      where: 'top',
+      style: {
+        background: 'background: red',
+        minWidth: 'min-width: 136px',
+      }, 
+      arrowStyle: {
+        border: 'border: 2px solid green'
+      }
     });
     tooltip.render();
   });

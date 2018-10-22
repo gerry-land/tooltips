@@ -96,7 +96,7 @@
 const createTooltip = __webpack_require__(/*! ./src/createTooltip */ "../src/createTooltip.js");
 const removeTooltip = __webpack_require__(/*! ./src/removeTooltip */ "../src/removeTooltip.js");
 const insertElement = __webpack_require__(/*! ./src/helpers/insertElement */ "../src/helpers/insertElement.js");
-const getDefaultConfig = __webpack_require__(/*! ./src/getDefaultConfig */ "../src/getDefaultConfig.js");
+const getDefaultConfig = __webpack_require__(/*! ./src/helpers/getDefaultConfig */ "../src/helpers/getDefaultConfig.js");
 
 /**
  * global class for creating tooltip
@@ -126,7 +126,7 @@ class Tooltip {
   render() {
     let tooltip = createTooltip(this.element, this.message, this.config);
     insertElement(document.body, tooltip);
-    // removeTooltip(tooltip);
+    removeTooltip(tooltip);
   }
 
 }
@@ -248,56 +248,9 @@ function createTooltipContent(styles, message, element) {
   setStyles(tooltipContent, styles);
 
   return tooltipContent;
-
 }
-
 
 module.exports = createTooltipContent;
-
-/***/ }),
-
-/***/ "../src/getDefaultConfig.js":
-/*!**********************************!*\
-  !*** ../src/getDefaultConfig.js ***!
-  \**********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-/**
- * Set up default config for tooltip
- */
-function getDefaultConfig() {
-
-  const config = {
-    where: 'bottom',
-    position: 'absolute',
-    isArrow: true,
-    style: {
-      position: 'position: relative',
-      minWidth: 'min-width: 136px',
-      minHeight: '30px',
-      padding: 'padding: 10px 10px',
-      boxSizing: 'box-sizing: border-box',
-      borderRadius: 'border-radius: 10px',
-      background: 'background: white', 
-      color: 'color: black',
-      fontSize: 'font-size: 11px',
-      lineHeight: 'line-height: 16px',
-      textAlign: 'text-align: center',
-      fontFamily: 'font-family: Montserrat, arial',
-    },
-    arrowStyle: {
-      background: 'background: inherit',
-      position: 'position: absolute',
-      zIndex: 'z-index: -1',
-      size: '10',
-      transform: 'transform: rotate(45deg)'
-    }
-  }
-
-  return config;
-}
-module.exports = getDefaultConfig;
 
 /***/ }),
 
@@ -316,7 +269,7 @@ function getPosition(position, size) {
 
   const offset = Math.round(size/2);
 
-  const left = 'calc((100% -' + size + 'px) / 2)';
+  const left = 'calc((100% - ' + size + 'px) / 2)';
   const top = 'calc((100% - ' + size + 'px) / 2)';
   
   switch (position) {
@@ -355,10 +308,54 @@ function getPosition(position, size) {
     x: x,
     y: y
   }
-
 }
 
 module.exports = getPosition;
+
+/***/ }),
+
+/***/ "../src/helpers/getDefaultConfig.js":
+/*!******************************************!*\
+  !*** ../src/helpers/getDefaultConfig.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Set up default config for tooltip
+ */
+function getDefaultConfig() {
+
+  const config = {
+    where: 'bottom',
+    position: 'absolute',
+    isArrow: true,
+    style: {
+      position: 'position: relative',
+      minHeight: '30px',
+      padding: 'padding: 10px',
+      boxSizing: 'box-sizing: border-box',
+      borderRadius: 'border-radius: 10px',
+      background: 'background: white', 
+      color: 'color: black',
+      fontSize: 'font-size: 11px',
+      lineHeight: 'line-height: 16px',
+      textAlign: 'text-align: center',
+      fontFamily: 'font-family: Montserrat, arial'
+    },
+    arrowStyle: {
+      position: 'position: absolute',
+      background: 'background: inherit',
+      color: 'color: inherit',
+      size: '10',
+      zIndex: 'z-index: -1',
+      transform: 'transform: rotate(45deg)'
+    }
+  }
+
+  return config;
+}
+module.exports = getDefaultConfig;
 
 /***/ }),
 
@@ -522,7 +519,6 @@ function getTooltipStyle(where, position, element) {
   styles.where = where;
 
   return Object.assign(styles, offset)
-
 }
 
 module.exports = getTooltipStyle;
@@ -549,8 +545,6 @@ const setStyles = __webpack_require__(/*! ./setStyles */ "../src/helpers/setStyl
  */
 
 function insertElement(parent, element, config) {
-
-  console.log(config);
 
   if (config) {
     const paste = new Promise((resolve) => {
@@ -603,7 +597,6 @@ function insertElement(parent, element, config) {
   } else {
     parent.insertAdjacentElement('beforeEnd', element);
   }
-
 }
 
 module.exports = insertElement;
@@ -672,7 +665,6 @@ function setStyles(element, config) {
   }
 
   element.style = style;
-
 }
 
 module.exports = setStyles;
@@ -734,7 +726,14 @@ const Tooltip = __webpack_require__(/*! ../index */ "../index.js");
   button_1.addEventListener('click', () => {
     const tooltip = new Tooltip(button_1, {
       message: 'hi dude from 1 button',
-      where: 'top'
+      where: 'top',
+      style: {
+        background: 'background: red',
+        minWidth: 'min-width: 136px',
+      }, 
+      arrowStyle: {
+        border: 'border: 2px solid green'
+      }
     });
     tooltip.render();
   });

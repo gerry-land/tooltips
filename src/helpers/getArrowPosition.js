@@ -6,7 +6,7 @@ function getPosition(position, size) {
 
   const offset = Math.round(size/2);
 
-  const left = 'calc((100% -' + size + 'px) / 2)';
+  const left = 'calc((100% - ' + size + 'px) / 2)';
   const top = 'calc((100% - ' + size + 'px) / 2)';
   
   switch (position) {
@@ -45,7 +45,6 @@ function getPosition(position, size) {
     x: x,
     y: y
   }
-
 }
 
 module.exports = getPosition;
