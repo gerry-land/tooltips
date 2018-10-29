@@ -6,11 +6,9 @@
  */
 
 function isElementFixed(element) {
-  let isFixed;
   function recurcive(element) {
     let style = window.getComputedStyle(element);
     let position = style.getPropertyValue('position');
-    isFixed = position === 'fixed';
     if (position === 'fixed') {
       return true;
     } else {
@@ -22,14 +20,7 @@ function isElementFixed(element) {
     }
   }
 
-  const promise = new Promise(resolve => {
-    resolve(recurcive(element));
-  });
-  promise.then(resolve => {
-    return resolve;
-  });
-
-  return isFixed;
+  return recurcive(element);
 }
 
 module.exports = isElementFixed;

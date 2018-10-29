@@ -18,11 +18,11 @@ function getTooltipStyle(where, position, element) {
   }
   
   const height = getStyleProperty(element, 'height');
+  let width = getStyleProperty(element, 'width');
   
   let top = getOffsetProperty(element, 'top', isFixed);
   let left = getOffsetProperty(element, 'left', isFixed);
   
-  let width = getStyleProperty(element, 'width');
 
   const dimension = {
     width: width,

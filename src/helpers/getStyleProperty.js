@@ -8,7 +8,7 @@
 function getStyleProperty(element, property) {
   const style = window.getComputedStyle(element);
   const result = style.getPropertyValue(property);
-  return Number.parseInt(result);
+  return parseInt(result);
 }
 
 module.exports = getStyleProperty;

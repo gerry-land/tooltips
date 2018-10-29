@@ -7,7 +7,7 @@ function setStyles(element, config) {
     }
   }
 
-  element.style = style;
+  element.setAttribute('style', style);
 }
 
 module.exports = setStyles;

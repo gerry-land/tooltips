@@ -77,7 +77,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/******/ 	__webpack_require__.p = "/";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
@@ -97,6 +97,9 @@ const createTooltip = __webpack_require__(/*! ./src/createTooltip */ "../src/cre
 const removeTooltip = __webpack_require__(/*! ./src/removeTooltip */ "../src/removeTooltip.js");
 const insertElement = __webpack_require__(/*! ./src/helpers/insertElement */ "../src/helpers/insertElement.js");
 const getDefaultConfig = __webpack_require__(/*! ./src/helpers/getDefaultConfig */ "../src/helpers/getDefaultConfig.js");
+const objectAssign = __webpack_require__(/*! ./src/helpers/objectAssignPolyfill */ "../src/helpers/objectAssignPolyfill.js");
+
+objectAssign.polyfill();
 
 /**
  * global class for creating tooltip
@@ -113,7 +116,7 @@ class Tooltip {
     this.config = Object.assign({}, defaultConfig, config);
     this.config.style = Object.assign({}, defaultConfig.style, config.style);
     this.config.arrowStyle = Object.assign({}, defaultConfig.arrowStyle, config.arrowStyle);
-    if(config.where) {
+    if (config.where) {
       this.config.where = config.where;
     }
   }
@@ -202,15 +205,14 @@ const getArrowPosition = __webpack_require__(/*! ./helpers/getArrowPosition */ "
 const setStyles = __webpack_require__(/*! ./helpers/setStyles */ "../src/helpers/setStyles.js");
 
 function createTooltipArrow(tooltip, config) {
-  
   const style = config.arrowStyle;
   const position = config.where;
   const size = +style.size;
 
   config.arrowOffset = size;
 
-  style.width = 'width: ' + size + 'px;'
-  style.height = 'height: ' + size + 'px;'
+  style.width = 'width: ' + size + 'px;';
+  style.height = 'height: ' + size + 'px;';
 
   const arrow = document.createElement('div');
   arrow.classList.add('tooltip__arrow');
@@ -227,6 +229,7 @@ function createTooltipArrow(tooltip, config) {
 
 module.exports = createTooltipArrow;
 
+
 /***/ }),
 
 /***/ "../src/createTooltipContent.js":
@@ -240,15 +243,14 @@ const setStyles = __webpack_require__(/*! ./helpers/setStyles */ "../src/helpers
 const getStyleProperty = __webpack_require__(/*! ./helpers/getStyleProperty */ "../src/helpers/getStyleProperty.js");
 
 function createTooltipContent(styles, message, element) {
-
   const tooltipContent = document.createElement('div');
-  
+
   tooltipContent.classList.add('tooltip__content');
   tooltipContent.innerHTML = message;
 
   const width = getStyleProperty(element, 'width');
   styles.width = 'width: ' + width + 'px';
-  styles.marginLeft = 'margin-left: calc((' + width + 'px - 100%) / 2)'
+  styles.marginLeft = 'margin-left: calc((' + width + 'px - 100%) / 2)';
 
   setStyles(tooltipContent, styles);
 
@@ -256,6 +258,7 @@ function createTooltipContent(styles, message, element) {
 }
 
 module.exports = createTooltipContent;
+
 
 /***/ }),
 
@@ -407,10 +410,11 @@ module.exports = getOffsetProperty;
 function getStyleProperty(element, property) {
   const style = window.getComputedStyle(element);
   const result = style.getPropertyValue(property);
-  return Number.parseInt(result);
+  return parseInt(result);
 }
 
 module.exports = getStyleProperty;
+
 
 /***/ }),
 
@@ -503,11 +507,11 @@ function getTooltipStyle(where, position, element) {
   }
   
   const height = getStyleProperty(element, 'height');
+  let width = getStyleProperty(element, 'width');
   
   let top = getOffsetProperty(element, 'top', isFixed);
   let left = getOffsetProperty(element, 'left', isFixed);
   
-  let width = getStyleProperty(element, 'width');
 
   const dimension = {
     width: width,
@@ -539,70 +543,74 @@ const setStyles = __webpack_require__(/*! ./setStyles */ "../src/helpers/setStyl
 
 /**
  * Inserting element to DOM
- * 
- * @param {HTMLElement} parent 
- * @param {HTMLElement} element 
- * @param {Object} config 
- * 
+ *
+ * @param {HTMLElement} parent
+ * @param {HTMLElement} element
+ * @param {Object} config
+ *
  * @return {void}
  */
 
 function insertElement(parent, element, config) {
-
   if (config) {
-    const paste = new Promise((resolve) => {
-      resolve(
-        parent.insertAdjacentElement('afterBegin', element)
-      );
-    });
-
-    let arrow = config.arrowOffset || 0;
-
-    paste.then(resolve => {
-      config.display = 'display: block'
-      let top;
-      const contentHeight = element.clientHeight;
-
-      switch (config.where) {
-        case 'right': {
-          top = config.y - ((contentHeight - config.elementHeight) / 2);
-          config.top = 'top: ' + top + 'px';
-          config.left = 'left: ' + (config.x + arrow) + 'px'; 
-
-          break;
-        }
-
-        case 'left': {
-          top = config.y - ((contentHeight - config.elementHeight) / 2);
-          config.top = 'top: ' + top + 'px';
-          config.left = 'left: ' + (config.x - arrow) + 'px';
-
-          break;
-        }
-
-        case 'top': {
-          top = config.y - (contentHeight - config.elementHeight);
-          config.top = 'top: ' + (top - arrow) + 'px';
-          config.left = 'left: ' + config.x + 'px';
-          break;
-        }
-
-        default: {
-          config.top = 'top: ' + (config.y + arrow) + 'px';
-          config.left = 'left: ' + config.x + 'px';
-
-          break;
-        }
-      }
-
-      setStyles(parent, config);
-    })
+    insert();
   } else {
     parent.insertAdjacentElement('beforeEnd', element);
   }
+
+  function insert() {
+    parent.insertAdjacentElement('afterBegin', element);
+    document.body.addEventListener('DOMNodeInserted', ev => {
+      if (ev.srcElement === parent) {
+        computeStyles();
+      }
+    });
+  };
+
+  function computeStyles() {
+    let arrow = config.arrowOffset || 0;
+    config.display = 'display: block';
+    let top;
+    const contentHeight = element.clientHeight;
+
+    switch (config.where) {
+      case 'right': {
+        top = config.y  - ((contentHeight - config.elementHeight) / 2);
+        config.top = 'top: ' + top + 'px';
+        config.left = 'left: ' + (config.x + arrow) + 'px';
+
+        break;
+      }
+
+      case 'left': {
+        top = config.y - ((config.elementHeight - contentHeight) / 2);
+        config.top = 'top: ' + top + 'px';
+        config.left = 'left: ' + (config.x - arrow) + 'px';
+
+        break;
+      }
+
+      case 'top': {
+        top = config.y - (contentHeight - config.elementHeight);
+        config.top = 'top: ' + (top - arrow) + 'px';
+        config.left = 'left: ' + config.x + 'px';
+        break;
+      }
+
+      default: {
+        config.top = 'top: ' + (config.y + arrow) + 'px';
+        config.left = 'left: ' + config.x + 'px';
+
+        break;
+      }
+    }
+
+    setStyles(parent, config);
+  };
 }
 
 module.exports = insertElement;
+
 
 /***/ }),
 
@@ -621,11 +629,9 @@ module.exports = insertElement;
  */
 
 function isElementFixed(element) {
-  let isFixed;
   function recurcive(element) {
     let style = window.getComputedStyle(element);
     let position = style.getPropertyValue('position');
-    isFixed = position === 'fixed';
     if (position === 'fixed') {
       return true;
     } else {
@@ -637,17 +643,91 @@ function isElementFixed(element) {
     }
   }
 
-  const promise = new Promise(resolve => {
-    resolve(recurcive(element));
-  });
-  promise.then(resolve => {
-    return resolve;
-  });
-
-  return isFixed;
+  return recurcive(element);
 }
 
 module.exports = isElementFixed;
+
+
+/***/ }),
+
+/***/ "../src/helpers/objectAssignPolyfill.js":
+/*!**********************************************!*\
+  !*** ../src/helpers/objectAssignPolyfill.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Code refactored from Mozilla Developer Network:
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+ */
+
+
+
+function assign(target, firstSource) {
+  if (target === undefined || target === null) {
+    throw new TypeError('Cannot convert first argument to object');
+  }
+
+  var to = Object(target);
+  for (var i = 1; i < arguments.length; i++) {
+    var nextSource = arguments[i];
+    if (nextSource === undefined || nextSource === null) {
+      continue;
+    }
+
+    var keysArray = Object.keys(Object(nextSource));
+    for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
+      var nextKey = keysArray[nextIndex];
+      var desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+      if (desc !== undefined && desc.enumerable) {
+        to[nextKey] = nextSource[nextKey];
+      }
+    }
+  }
+  return to;
+}
+
+function polyfill() {
+  if (!Object.assign) {
+    Object.defineProperty(Object, 'assign', {
+      enumerable: false,
+      configurable: true,
+      writable: true,
+      value: assign
+    });
+  }
+}
+
+module.exports = {
+  assign: assign,
+  polyfill: polyfill
+};
+
+
+/***/ }),
+
+/***/ "../src/helpers/removePolyfill.js":
+/*!****************************************!*\
+  !*** ../src/helpers/removePolyfill.js ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function createRemoveMethod() {
+  if (!('remove' in Element.prototype)) {
+    Element.prototype.remove = function () {
+      if (this.parentNode) {
+        this.parentNode.removeChild(this);
+      }
+    };
+  }
+};
+
+module.exports = createRemoveMethod;
+
 
 /***/ }),
 
@@ -667,10 +747,11 @@ function setStyles(element, config) {
     }
   }
 
-  element.style = style;
+  element.setAttribute('style', style);
 }
 
 module.exports = setStyles;
+
 
 /***/ }),
 
@@ -679,7 +760,9 @@ module.exports = setStyles;
   !*** ../src/removeTooltip.js ***!
   \*******************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+const removeMethod = __webpack_require__(/*! ./helpers/removePolyfill */ "../src/helpers/removePolyfill.js");
 
 /**
  * Implementihg close tooltip logic
@@ -689,6 +772,7 @@ module.exports = setStyles;
  * @returns {void}
  */
 function removeTooltip(tooltip) {
+  removeMethod();
   let time = setTimeout(removeElement, 5000);
   let clickTimer = setTimeout(addClick, 50);
   function addClick() {
@@ -711,6 +795,7 @@ function removeTooltip(tooltip) {
 }
 
 module.exports = removeTooltip;
+
 
 /***/ }),
 

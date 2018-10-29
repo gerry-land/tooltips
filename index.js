@@ -2,6 +2,9 @@ const createTooltip = require('./src/createTooltip');
 const removeTooltip = require('./src/removeTooltip');
 const insertElement = require('./src/helpers/insertElement');
 const getDefaultConfig = require('./src/helpers/getDefaultConfig');
+const objectAssign = require('./src/helpers/objectAssignPolyfill');
+
+objectAssign.polyfill();
 
 /**
  * global class for creating tooltip
@@ -18,7 +21,7 @@ class Tooltip {
     this.config = Object.assign({}, defaultConfig, config);
     this.config.style = Object.assign({}, defaultConfig.style, config.style);
     this.config.arrowStyle = Object.assign({}, defaultConfig.arrowStyle, config.arrowStyle);
-    if(config.where) {
+    if (config.where) {
       this.config.where = config.where;
     }
   }

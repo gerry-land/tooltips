@@ -1,13 +1,5 @@
 const webpack = require('webpack');
-
-const config = {
-  entry: './index.js',
-  output: {
-    filename: 'script.js'
-  },
-  mode: 'development',
-  devtool: 'source-map'
-}
+const config = require('./webpack.config');
 
 const callback = (() => {
   var lastHash = null;

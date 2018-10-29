@@ -1,3 +1,5 @@
+const removeMethod = require('./helpers/removePolyfill');
+
 /**
  * Implementihg close tooltip logic
  * @param {HTMLElement} tooltip
@@ -6,6 +8,7 @@
  * @returns {void}
  */
 function removeTooltip(tooltip) {
+  removeMethod();
   let time = setTimeout(removeElement, 5000);
   let clickTimer = setTimeout(addClick, 50);
   function addClick() {
