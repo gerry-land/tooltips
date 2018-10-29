@@ -7,6 +7,8 @@ const Tooltip = require('../index');
     const tooltip = new Tooltip(button_1, {
       message: 'hi dude from 1 button',
       where: 'top',
+      arrowOffset: 10,
+      class: ['test', 'test1'],
       style: {
         background: 'background: red',
         minWidth: 'min-width: 136px',

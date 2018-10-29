@@ -110,9 +110,9 @@ class Tooltip {
     const defaultConfig = getDefaultConfig();
     this.element = element;
     this.message = config.message;
-    this.config = defaultConfig;
-    this.config.style = Object.assign(this.config.style, config.style);
-    this.config.arrowStyle = Object.assign(this.config.arrowStyle, config.arrowStyle);
+    this.config = Object.assign({}, defaultConfig, config);
+    this.config.style = Object.assign({}, defaultConfig.style, config.style);
+    this.config.arrowStyle = Object.assign({}, defaultConfig.arrowStyle, config.arrowStyle);
     if(config.where) {
       this.config.where = config.where;
     }
@@ -125,6 +125,7 @@ class Tooltip {
    */
   render() {
     let tooltip = createTooltip(this.element, this.message, this.config);
+    this.content = tooltip;
     insertElement(document.body, tooltip);
     removeTooltip(tooltip);
   }
@@ -159,6 +160,11 @@ function createTooltip(element, message, config) {
   
   const tooltip = document.createElement('div');
   tooltip.classList.add('tooltip');
+  if (config.class) {
+    config.class.forEach(el => {
+      tooltip.classList.add(el);
+    });
+  }
  
   const tooltipStyles = getTooltipStyles(config.where, config.position, element);
 
@@ -264,7 +270,7 @@ function getPosition(position, size) {
   
   let x, y;
 
-  const offset = Math.round(size/2);
+  const offset = Math.round(size/2) + 'px';
 
   const left = 'calc((100% - ' + size + 'px) / 2)';
   const top = 'calc((100% - ' + size + 'px) / 2)';
@@ -724,6 +730,8 @@ const Tooltip = __webpack_require__(/*! ../index */ "../index.js");
     const tooltip = new Tooltip(button_1, {
       message: 'hi dude from 1 button',
       where: 'top',
+      arrowOffset: 10,
+      class: ['test', 'test1'],
       style: {
         background: 'background: red',
         minWidth: 'min-width: 136px',

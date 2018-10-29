@@ -14,6 +14,11 @@ function createTooltip(element, message, config) {
   
   const tooltip = document.createElement('div');
   tooltip.classList.add('tooltip');
+  if (config.class) {
+    config.class.forEach(el => {
+      tooltip.classList.add(el);
+    });
+  }
  
   const tooltipStyles = getTooltipStyles(config.where, config.position, element);
 
