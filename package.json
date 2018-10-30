@@ -1,6 +1,6 @@
 {
   "name": "make-tooltips",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "module for creating flexible tooltips",
   "main": "index.js",
   "scripts": {

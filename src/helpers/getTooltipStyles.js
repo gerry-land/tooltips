@@ -23,7 +23,6 @@ function getTooltipStyle(where, position, element) {
   let top = getOffsetProperty(element, 'top', isFixed);
   let left = getOffsetProperty(element, 'left', isFixed);
   
-
   const dimension = {
     width: width,
     height: height,
@@ -34,9 +33,10 @@ function getTooltipStyle(where, position, element) {
   const offset = getTooltipPosition(dimension, where);
 
   styles.elementHeight = height;
+  styles.width = 'width: ' + width + 'px';
   styles.where = where;
 
-  return Object.assign(styles, offset)
+  return Object.assign({}, styles, offset)
 }
 
 module.exports = getTooltipStyle;

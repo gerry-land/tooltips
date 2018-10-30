@@ -50,7 +50,4 @@ const Tooltip = require('../index');
     tooltip.render();
   });
 
-
-  
-
 })();

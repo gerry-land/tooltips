@@ -27,6 +27,7 @@ function insertElement(parent, element, config) {
   };
 
   function computeStyles() {
+
     let arrow = config.arrowOffset || 0;
     config.display = 'display: block';
     let top;

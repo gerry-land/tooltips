@@ -1,7 +1,8 @@
 /node_modules/
 
 example/node_modules
-/example/dist/
+./example/dist/
+
 
 dist/
 
