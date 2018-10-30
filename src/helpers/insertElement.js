@@ -32,6 +32,7 @@ function insertElement(parent, element, config) {
     config.display = 'display: block';
     let top;
     const contentHeight = element.clientHeight;
+    config.width = 'width: ' + element.clientWidth + 'px';
 
     switch (config.where) {
       case 'right': {
@@ -64,7 +65,6 @@ function insertElement(parent, element, config) {
         break;
       }
     }
-
     setStyles(parent, config);
   };
 }

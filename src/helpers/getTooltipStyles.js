@@ -33,7 +33,6 @@ function getTooltipStyle(where, position, element) {
   const offset = getTooltipPosition(dimension, where);
 
   styles.elementHeight = height;
-  styles.width = 'width: ' + width + 'px';
   styles.where = where;
 
   return Object.assign({}, styles, offset)
